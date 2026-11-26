@@ -1,0 +1,22 @@
+---
+/**
+ * SMPD wordmark, vectorised from the supplied logo artwork.
+ * Letters use currentColor (ink on light, ivory on dark); accents stay leaf green.
+ */
+import { wordmark } from '../data/brand';
+
+interface Props {
+  size?: 'sm' | 'lg';
+  descriptor?: boolean;
+  class?: string;
+}
+const { size = 'sm', descriptor = false, class: cls = '' } = Astro.props;
+---
+
+<span class={`wordmark wm-${size} ${cls}`}>
+  <svg class="wm-logo" viewBox={wordmark.viewBox} role="img" aria-label="SMPD" focusable="false">
+    <path class="wm-letters" fill="currentColor" fill-rule="evenodd" d={wordmark.letters} />
+    <path class="wm-accents" d={wordmark.accents} />
+  </svg>
+  {descriptor && <span class="wm-desc">Land &amp; Homes</span>}
+</span>

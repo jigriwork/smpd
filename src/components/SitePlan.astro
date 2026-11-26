@@ -1,0 +1,41 @@
+---
+/** Topographic site plan of the study model: contours, plot boundary, footprint, trees. Illustrative. */
+import { layerOutline, LAYERS } from '../lib/terrain';
+
+const path = (pts: { x: number; y: number }[]) =>
+  'M' + pts.map((p) => `${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' L') + ' Z';
+
+const beyond = [1.62, 1.44, 1.28, 1.13].map((s) => path(layerOutline(0, 180, s)));
+const contours = LAYERS.map((_, i) => path(layerOutline(i, 180)));
+
+// House footprint in plan (model group scaled 1.2, offset 0.4 / -0.3).
+const X = (v: number) => 0.4 + 1.2 * v;
+const Z = (v: number) => -0.3 + 1.2 * v;
+const rect = (x0: number, x1: number, z0: number, z1: number) => ({ x: X(x0), y: Z(z0), w: X(x1) - X(x0), h: Z(z1) - Z(z0) });
+const terrace = rect(-7, 7, -4.3, 4.3);
+const ground = rect(-5.9, 1.1, -3.2, 1.2);
+const roof = rect(-4.2, 6.2, -3.1, 1.9);
+const pool = rect(2.2, 5.8, 1.25, 2.95);
+const wall = rect(-6.3, 1.9, 3.63, 3.87);
+const plot = [[-10.2, -6.8], [10.6, -7.3], [11.4, 6.6], [-10.8, 6.2]];
+const trees = [[-14, 6.2, 1.5], [-16.5, -2.5, 1.2], [-12.5, -8.8, 1.35], [13.5, -7.6, 1.5], [15.8, 1.5, 1.15], [11.8, 8.6, 1.3], [-4.5, 10.2, 1.0], [3.5, 9.8, 1.1], [17.5, -3.8, 0.9]];
+---
+
+<svg class="drawing-svg" viewBox="-25 -17.5 50 35" role="img" aria-label="Illustrative site plan: contour lines, a traced plot boundary and a home footprint" data-draw>
+  <g class="d-faint">{beyond.map((d) => <path d={d} />)}</g>
+  <g class="d-mid">{contours.map((d, i) => <path d={d} class={i === 0 || i === 5 ? 'd-index' : ''} />)}</g>
+  <polygon class="d-plot no-draw" points={plot.map((p) => p.join(',')).join(' ')} />
+  {plot.map(([x, y]) => <circle class="d-pin no-draw" cx={x} cy={y} r="0.28" />)}
+  <g class="d-strong">
+    <rect x={terrace.x} y={terrace.y} width={terrace.w} height={terrace.h} />
+    <rect x={ground.x} y={ground.y} width={ground.w} height={ground.h} />
+    <rect x={roof.x} y={roof.y} width={roof.w} height={roof.h} class="d-roof" />
+    <rect x={wall.x} y={wall.y} width={wall.w} height={wall.h} />
+  </g>
+  <rect class="d-water no-draw" x={pool.x} y={pool.y} width={pool.w} height={pool.h} />
+  <g class="d-tree">{trees.map(([x, y, r]) => <circle cx={x} cy={y} r={r} />)}</g>
+  <g class="d-north no-draw" transform="translate(21.5 -13.5)">
+    <circle r="1.6" />
+    <path d="M0 -1.1 L0.5 0.7 L0 0.35 L-0.5 0.7 Z" />
+  </g>
+</svg>

@@ -1,0 +1,257 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Wordmark from '../components/Wordmark.astro';
+import Visual from '../components/Visual.astro';
+import SitePlan from '../components/SitePlan.astro';
+import Elevation from '../components/Elevation.astro';
+import {
+  site, nav, hero, heritage, story, focus, approach, nextChapter, contactSection, footer,
+  familyBusinesses, formEndpoint,
+} from '../data/site';
+---
+
+<Base>
+  <Header />
+
+  <main id="main">
+    <!-- HERO: live study model (WebGL) with a static fallback -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-stage" data-stage aria-hidden="true">
+        <canvas class="hero-canvas" data-hero-canvas></canvas>
+        <img class="hero-fallback" data-hero-fallback alt="" width="1600" height="1000" decoding="async"
+          data-src="/visuals/model-hero-2400.webp" data-src-mobile="/visuals/model-hero-mobile.webp" />
+        <noscript><img class="hero-fallback is-on" src="/visuals/model-hero-2400.webp" alt="" width="1600" height="1000" /></noscript>
+      </div>
+      <p class="tag hero-tag" data-hero-fade>Illustrative study model</p>
+
+      <div class="hero-content">
+        <p class="meta hero-meta" data-hero-fade>{hero.eyebrow}</p>
+        <h1 id="hero-title" class="hero-title">
+          {hero.lines.map((line, i) => (
+            <span class="line"><span class={`line-inner ${i === 1 ? 'soft' : ''}`} data-hero-line>{line}</span></span>
+          ))}
+        </h1>
+        <div class="hero-side">
+          <p class="hero-body" data-hero-fade>{hero.body}</p>
+          <div class="hero-actions" data-hero-fade>
+            <a href={hero.primary.href} class="btn btn-ink">
+              <span class="btn-label">{hero.primary.label}</span>
+              <svg class="btn-arrow" viewBox="0 0 20 12" aria-hidden="true"><path d="M0 6h18M13 1l5 5-5 5" /></svg>
+            </a>
+            <a href={hero.secondary.href} class="link-line"><span>{hero.secondary.label}</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERITAGE -->
+    <section class="heritage dark" aria-labelledby="heritage-title">
+      <div class="container">
+        <div class="heritage-grid">
+          <p class="figure" aria-hidden="true" data-figure>70<span>+</span></p>
+          <div class="heritage-text">
+            <h2 id="heritage-title" class="figure-label" data-reveal><span class="sr-only">70+ </span>{heritage.label}</h2>
+            <p class="heritage-attr" data-reveal>{heritage.attribution}</p>
+            <p class="heritage-thought" data-reveal>{heritage.thought}</p>
+          </div>
+        </div>
+
+        <div class="family" aria-labelledby="family-title">
+          <p class="meta family-title" id="family-title" data-reveal>{heritage.related}</p>
+          <ul class="family-list">
+            {familyBusinesses.map((b, i) => (
+              <li class="family-item" data-reveal style={`--i:${i}`}>
+                <span class="fi-num">{String(i + 1).padStart(2, '0')}</span>
+                <span class="fi-name">{b}</span>
+              </li>
+            ))}
+          </ul>
+          <p class="family-note" data-reveal>Family businesses in Berhampur. Shown here as part of our story, not as partners or endorsements.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORY -->
+    <section class="story section" id="story" aria-labelledby="story-title">
+      <div class="container">
+        <div class="story-grid">
+          <div class="story-head">
+            <p class="meta" data-reveal>{story.kicker}</p>
+            <h2 id="story-title" class="h2" data-split>{story.heading}</h2>
+          </div>
+          <div class="story-body">
+            <p class="lead" data-reveal>{story.lead}</p>
+            <div class="story-cols">
+              {story.paragraphs.map((p) => <p data-reveal>{p}</p>)}
+            </div>
+          </div>
+        </div>
+
+        <ol class="chapters" aria-label="Our family story" data-chapters>
+          <span class="chapters-line" aria-hidden="true"><span data-chapters-fill></span></span>
+          {story.chapters.map((c, i) => (
+            <li class={`chapter ${i === story.chapters.length - 1 ? 'is-now' : ''}`} data-reveal>
+              <span class="chapter-node" aria-hidden="true"></span>
+              <p class="chapter-mark">{c.mark}</p>
+              <p class="chapter-text">{c.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- FOCUS: heritage opens into the future -->
+    <section class="focus section dark" id="focus" aria-labelledby="focus-title" data-threshold>
+      <div class="container">
+        <div class="section-head">
+          <p class="meta" data-reveal>{focus.kicker}</p>
+          <h2 id="focus-title" class="h2" data-split>{focus.heading}</h2>
+          <p class="section-intro" data-reveal>{focus.intro}</p>
+        </div>
+
+        <div class="focus-grid">
+          {focus.items.map((item, i) => (
+            <article class={`focus-card fc-${i}`} aria-labelledby={`focus-${i}`}>
+              <figure class="drawing">
+                <figcaption class="drawing-head">
+                  <span>{i === 0 ? 'Site plan' : 'Front elevation'}</span>
+                  <span class="tag">Illustrative drawing</span>
+                </figcaption>
+                {i === 0 ? <SitePlan /> : <Elevation />}
+              </figure>
+              <div class="fc-body">
+                <span class="fc-num">{item.index}</span>
+                <h3 id={`focus-${i}`} class="fc-title">{item.title}</h3>
+                <p class="fc-text">{item.text}</p>
+                <p class="fc-points">{item.points.join('  ·  ')}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- APPROACH -->
+    <section class="approach section" id="approach" aria-labelledby="approach-title">
+      <div class="container approach-grid">
+        <div class="approach-head">
+          <p class="meta" data-reveal>{approach.kicker}</p>
+          <h2 id="approach-title" class="h2" data-split>{approach.heading}</h2>
+          <p class="section-intro" data-reveal>{approach.intro}</p>
+        </div>
+        <ol class="principles">
+          {approach.principles.map((p, i) => (
+            <li class="principle" data-reveal>
+              <span class="pr-num">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <h3 class="pr-title">{p.title}</h3>
+                <p class="pr-text">{p.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <!-- NEXT CHAPTER -->
+    <section class="next dark" id="next" aria-labelledby="next-title">
+      <div class="next-visual">
+        <Visual src="/visuals/model-dusk" alt="Illustrative study model of a home at dusk with warm interior light" ratio="2000 / 840" full />
+      </div>
+      <div class="container next-inner">
+        <div class="section-head">
+          <p class="meta" data-reveal>{nextChapter.kicker}</p>
+          <h2 id="next-title" class="h2" data-split>{nextChapter.heading}</h2>
+          <p class="section-intro" data-reveal>{nextChapter.intro}</p>
+        </div>
+        <ul class="invites">
+          {nextChapter.invitations.map((inv) => (
+            <li class="invite" data-reveal>
+              <h3>{inv.title}</h3>
+              <p>{inv.text}</p>
+              <a href="#contact" class="link-line light" data-interest={inv.interest}><span>{nextChapter.cta}</span></a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact section" id="contact" aria-labelledby="contact-title">
+      <div class="container contact-grid">
+        <div class="contact-copy">
+          <p class="meta" data-reveal>{contactSection.kicker}</p>
+          <h2 id="contact-title" class="h2" data-split>{contactSection.heading}</h2>
+          <p class="section-intro" data-reveal>{contactSection.intro}</p>
+          <dl class="contact-meta" data-reveal>
+            <div><dt>Based in</dt><dd>{site.location}</dd></div>
+            <div><dt>Working across</dt><dd>{site.region}</dd></div>
+            {site.contact.phone && <div><dt>Phone</dt><dd><a href={`tel:${site.contact.phone.replace(/\s/g, '')}`}>{site.contact.phone}</a></dd></div>}
+            {site.contact.email && <div><dt>Email</dt><dd><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></dd></div>}
+            {site.contact.address && <div><dt>Office</dt><dd>{site.contact.address}</dd></div>}
+          </dl>
+        </div>
+
+        <form class="enquiry" data-enquiry data-endpoint={formEndpoint} novalidate aria-describedby="consent-note">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required />
+            <p class="field-error" id="f-name-err" hidden>Please tell us your name.</p>
+          </div>
+          <div class="field">
+            <label for="f-phone">Phone</label>
+            <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+            <p class="field-error" id="f-phone-err" hidden>Please enter a phone number we can reach you on.</p>
+          </div>
+          <fieldset class="field interest">
+            <legend>I’m interested in</legend>
+            <div class="options">
+              {contactSection.interests.map((opt, i) => (
+                <label class="option">
+                  <input type="radio" name="interest" value={opt.value} checked={i === 0} />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="f-message">Message <span class="optional">(optional)</span></label>
+            <textarea id="f-message" name="message" rows="3"></textarea>
+          </div>
+          <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p class="consent" id="consent-note">{contactSection.consent}</p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-ink">
+              <span class="btn-label">Send enquiry</span>
+              <svg class="btn-arrow" viewBox="0 0 20 12" aria-hidden="true"><path d="M0 6h18M13 1l5 5-5 5" /></svg>
+            </button>
+          </div>
+          <p class="form-status" role="status" aria-live="polite" data-status></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer dark">
+    <div class="container">
+      <p class="footer-line">{footer.line}</p>
+      <div class="footer-mark"><Wordmark size="lg" /></div>
+      <div class="footer-bottom">
+        <nav aria-label="Footer">
+          <ul>{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+        </nav>
+        <div class="footer-meta">
+          <p>{site.descriptor} · {site.region}</p>
+          {site.contact.phone && <p><a href={`tel:${site.contact.phone.replace(/\s/g, '')}`}>{site.contact.phone}</a></p>}
+          {site.contact.email && <p><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></p>}
+          <p>© {new Date().getFullYear()} {site.legal.entityName ?? site.name}</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    import '../scripts/main';
+  </script>
+</Base>

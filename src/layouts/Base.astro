@@ -1,0 +1,78 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/newsreader/standard-italic.css';
+import '../styles/global.css';
+import { site } from '../data/site';
+import sansFont from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = site.title, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL('/og-image.jpg', site.url).href;
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preload" href={sansFont} as="font" type="font/woff2" crossorigin />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#1f211c" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph: used by WhatsApp, Facebook, LinkedIn and most chat apps -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SMPD. A legacy of trust. A new foundation. Land and homes in Berhampur, Odisha." />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: site.name,
+      url: site.url,
+      logo: new URL('/icon-512.png', site.url).href,
+      description,
+      areaServed: { '@type': 'City', name: 'Berhampur', containedInPlace: { '@type': 'State', name: 'Odisha' } },
+    })} />
+
+    <script is:inline>
+      // Enable motion styles only when the visitor has not asked for reduced motion.
+      // A safety timer reveals content if scripts fail to start.
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('motion');
+          window.__motionFallback = setTimeout(function () { d.classList.remove('motion'); }, 3500);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

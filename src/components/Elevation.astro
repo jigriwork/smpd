@@ -1,0 +1,60 @@
+---
+/** Front elevation of the study-model home, drawn in architectural line conventions. Illustrative. */
+const R = (x0: number, x1: number, y0: number, y1: number) => ({ x: x0, y: -y1, width: x1 - x0, height: y1 - y0 });
+const upper = R(-3.8, 5.8, 2.92, 5.42);
+const upperGlass = R(-3.5, 5.5, 3.3, 5.0);
+const roof = R(-4.3, 6.3, 5.42, 5.62);
+const groundVol = R(-5.9, 1.1, 0.22, 2.92);
+const groundGlass = R(-5.5, 0.7, 0.42, 2.52);
+const column = R(5.5, 5.7, 0.22, 2.92);
+const pavilion = R(-7.1, -4.9, 0.22, 1.12);
+const terrace = R(-7.2, 7.2, 0, 0.22);
+const wall = R(-6.3, 1.9, 0.22, 1.27);
+const fins = Array.from({ length: 22 }, (_, k) => 0.2 + k * 0.255);
+const mullions = [-4.3, -3.1, -1.9, -0.7];
+const hatch = Array.from({ length: 40 }, (_, k) => -9.6 + k * 0.5);
+const levels = [
+  { y: 0, label: 'GL' },
+  { y: 2.92, label: 'L1' },
+  { y: 5.62, label: 'RL' },
+];
+---
+
+<svg class="drawing-svg" viewBox="-10.5 -7.4 21 9.6" role="img" aria-label="Illustrative front elevation of a contemporary two-level home with timber fins" data-draw>
+  <g class="d-faint">
+    {levels.map((l) => <line x1="-10" x2="8.4" y1={-l.y} y2={-l.y} class="d-guide" />)}
+  </g>
+  <g class="d-strong">
+    <rect {...upper} class="d-fill" />
+    <rect {...upperGlass} class="d-glass" />
+    <rect {...groundVol} class="d-fill" />
+    <rect {...groundGlass} class="d-glass" />
+    {mullions.map((x) => <line x1={x} x2={x} y1={-0.42} y2={-2.52} class="d-thin" />)}
+    <rect {...column} class="d-fill" />
+    <rect {...pavilion} class="d-fill" />
+    <rect {...roof} class="d-fill" />
+    <rect {...terrace} class="d-fill" />
+    <rect {...wall} class="d-fill" />
+  </g>
+  <g class="d-fins">{fins.map((x) => <line x1={x} x2={x} y1={-3.02} y2={-5.32} />)}</g>
+  <g class="d-tree">
+    <circle cx="-8.6" cy="-2.5" r="1.25" /><line x1="-8.6" x2="-8.6" y1="-1.25" y2="0" />
+    <circle cx="8.2" cy="-2.1" r="1.0" /><line x1="8.2" x2="8.2" y1="-1.1" y2="0" />
+  </g>
+  <line x1="-10.2" x2="10.2" y1="0" y2="0" class="d-ground" />
+  <g class="d-faint d-hatch">{hatch.map((x) => <line x1={x} x2={x - 0.45} y1="0.08" y2="0.6" />)}</g>
+  <g class="d-dim">
+    <line x1="-4.3" x2="6.3" y1="-6.5" y2="-6.5" />
+    <line x1="-4.3" x2="-4.3" y1="-6.25" y2="-6.75" />
+    <line x1="6.3" x2="6.3" y1="-6.25" y2="-6.75" />
+    <line x1="0.2" x2="5.81" y1="-6.05" y2="-6.05" class="d-thin" />
+  </g>
+  <g class="d-levels no-draw">
+    {levels.map((l) => (
+      <g transform={`translate(9 ${-l.y})`}>
+        <path d="M0 0 L0.32 -0.42 L-0.32 -0.42 Z" />
+        <text x="0.6" y="-0.12">{l.label}</text>
+      </g>
+    ))}
+  </g>
+</svg>

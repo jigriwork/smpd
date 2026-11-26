@@ -1,0 +1,49 @@
+---
+import Wordmark from './Wordmark.astro';
+import { nav, site } from '../data/site';
+---
+
+<header class="site-header" data-header>
+  <div class="header-inner">
+    <a href="#top" class="brand" aria-label="SMPD, back to top">
+      <Wordmark descriptor />
+    </a>
+
+    <nav class="nav-desktop" aria-label="Primary">
+      <ul>
+        {nav.map((item) => (
+          <li><a href={item.href} class="nav-link"><span>{item.label}</span></a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <a href="#contact" class="btn-pill header-cta">Speak with SMPD</a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="sr-only" data-menu-label>Open menu</span>
+      <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-menu hidden>
+    <nav aria-label="Mobile">
+      <ol>
+        {nav.map((item, i) => (
+          <li style={`--i:${i}`}>
+            <a href={item.href} data-menu-link>
+              <span class="mm-index">{`0${i + 1}`}</span>
+              <span class="mm-label">{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <div class="mm-foot">
+      <a href="#contact" class="btn btn-light" data-menu-link>
+        <span class="btn-label">Speak with SMPD</span>
+        <svg class="btn-arrow" viewBox="0 0 20 12" aria-hidden="true"><path d="M0 6h18M13 1l5 5-5 5" /></svg>
+      </a>
+      <p>{site.descriptor} · {site.region}</p>
+    </div>
+  </div>
+</header>
