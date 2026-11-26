@@ -33,6 +33,9 @@ export function initHeader() {
     toggle.setAttribute('aria-expanded', String(next));
     if (label) label.textContent = next ? 'Close menu' : 'Open menu';
     root.classList.toggle('menu-open', next);
+    // Pause smooth scrolling while the menu covers the page.
+    const lenis = (window as any).__lenis;
+    if (lenis) next ? lenis.stop() : lenis.start();
     if (next) {
       header.classList.remove('is-hidden');
       menu.hidden = false;

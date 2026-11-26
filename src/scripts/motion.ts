@@ -9,9 +9,24 @@
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 const root = document.documentElement;
+
+/** Intro curtain: a counter runs to 100, then the curtain lifts. Resolves as the lift begins. */
+function runLoader(): Promise<void> {
+  const el = document.querySelector<HTMLElement>('[data-loader]');
+  const count = el?.querySelector<HTMLElement>('[data-loader-count]');
+  if (!el || !count || !root.classList.contains('intro')) { root.classList.remove('intro'); return Promise.resolve(); }
+  return new Promise((resolve) => {
+    const o = { v: 0 };
+    gsap.timeline({ onComplete: () => { root.classList.remove('intro'); gsap.set(el, { clearProps: 'all' }); } })
+      .to(o, { v: 100, duration: 1.3, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(o.v)).padStart(3, '0'); } })
+      .to(el, { yPercent: -100, duration: 1, ease: 'power4.inOut' }, '+=0.12')
+      .add(() => resolve(), '<+0.25');
+  });
+}
 
 const escapeHTML = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
@@ -45,7 +60,7 @@ export function showHeroFallback() {
   img.classList.add('is-on');
 }
 
-async function initHeroModel(cleanups: (() => void)[]) {
+async function initHeroModel(cleanups: (() => void)[], ready: Promise<void>) {
   const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
   if (!canvas || !webglAvailable()) { showHeroFallback(); return; }
   let model: ReturnType<typeof import('../three/model')['createModel']>;
@@ -62,6 +77,7 @@ async function initHeroModel(cleanups: (() => void)[]) {
     return;
   }
 
+  await ready;
   const intro = model.intro();
   intro.eventCallback('onComplete', () => model.light.play());
 
@@ -98,11 +114,61 @@ export function initMotion() {
   const cleanups: (() => void)[] = [];
   const restores: (() => void)[] = [];
 
+  // ---- Smooth scrolling, driven by the GSAP ticker so ScrollTrigger stays in step ----
+  const lenis = new Lenis({ lerp: 0.1, anchors: true });
+  (window as any).__lenis = lenis;
+  lenis.on('scroll', ScrollTrigger.update);
+  const raf = (t: number) => lenis.raf(t * 1000);
+  gsap.ticker.add(raf);
+  gsap.ticker.lagSmoothing(0);
+  cleanups.push(() => { gsap.ticker.remove(raf); lenis.destroy(); (window as any).__lenis = undefined; });
+
+  let ready!: Promise<void>;
+
   const ctx = gsap.context(() => {
-    // ---- Hero copy reads first ----
-    gsap.timeline({ defaults: { ease: 'power4.out' } })
+    ready = runLoader();
+    if (root.classList.contains('intro')) lenis.stop();
+    ready.then(() => lenis.start());
+
+    // ---- Hero copy reads first (after the curtain, on a first visit) ----
+    const heroTl = gsap.timeline({ paused: true, defaults: { ease: 'power4.out' } })
       .to('[data-hero-line]', { y: 0, duration: 1.3, stagger: 0.12 }, 0.1)
       .to('[data-hero-fade]', { opacity: 1, duration: 1, stagger: 0.08, ease: 'power2.out' }, 0.55);
+    ready.then(() => heroTl.play());
+
+    // ---- Intro statement: words light up as you read down ----
+    const words = gsap.utils.toArray<HTMLElement>('[data-words] .word');
+    if (words.length) {
+      gsap.to(words, {
+        opacity: 1, ease: 'none', stagger: 0.1,
+        scrollTrigger: { trigger: '[data-words]', start: 'top 82%', end: 'bottom 50%', scrub: true },
+      });
+    }
+
+    // ---- Marquee: drifts on its own, speeds up and follows scroll direction ----
+    const track = document.querySelector<HTMLElement>('[data-marquee-track]');
+    if (track) {
+      const loop = gsap.to(track, { xPercent: -50, duration: 42, ease: 'none', repeat: -1 });
+      loop.totalTime(loop.duration() * 100); // room to run backwards
+      let dir = 1;
+      ScrollTrigger.create({
+        trigger: '[data-marquee]', start: 'top bottom', end: 'bottom top',
+        onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
+        onUpdate: (self) => {
+          dir = self.direction;
+          const boost = Math.min(Math.abs(self.getVelocity()) / 250, 6);
+          gsap.timeline({ overwrite: true })
+            .to(loop, { timeScale: dir * (1 + boost), duration: 0.2 })
+            .to(loop, { timeScale: dir, duration: 1.2, ease: 'power2.out' });
+        },
+      });
+    }
+
+    // ---- Footer: the big wordmark rises into place as the page ends ----
+    gsap.fromTo('[data-footer-mark] .wm-logo', { yPercent: 55 }, {
+      yPercent: 0, ease: 'none',
+      scrollTrigger: { trigger: '.site-footer', start: 'top bottom', end: 'bottom bottom', scrub: true },
+    });
 
     gsap.to('.hero-content', {
       yPercent: -12, opacity: 0.2, ease: 'none',
@@ -157,6 +223,33 @@ export function initMotion() {
       });
     });
 
+    // ---- Approach: pin the section and run the principles sideways (wide, tall-enough screens) ----
+    mm.add('(min-width: 1021px) and (min-height: 640px)', () => {
+      const sec = document.querySelector<HTMLElement>('[data-hscroll]');
+      const rail = sec?.querySelector<HTMLElement>('[data-htrack]');
+      if (!sec || !rail) return;
+      const cards = rail.querySelectorAll<HTMLElement>('.principle');
+      const count = sec.querySelector<HTMLElement>('[data-hcount]');
+      const bar = sec.querySelector<HTMLElement>('[data-hprogress]');
+      sec.classList.add('is-pinned');
+      const dist = () => {
+        const last = cards[cards.length - 1];
+        const pad = parseFloat(getComputedStyle(rail).paddingLeft) || 0;
+        return Math.max(0, last.offsetLeft + last.offsetWidth + pad - rail.clientWidth);
+      };
+      gsap.to(rail, {
+        x: () => -dist(), ease: 'none',
+        scrollTrigger: {
+          trigger: sec, start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.8, invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            if (count) count.textContent = String(Math.min(cards.length, Math.round(self.progress * (cards.length - 1)) + 1)).padStart(2, '0');
+            if (bar) bar.style.transform = `scaleX(${self.progress})`;
+          },
+        },
+      });
+      return () => sec.classList.remove('is-pinned');
+    });
+
     // ---- Model stills: masks open, image settles, gentle parallax ----
     gsap.utils.toArray<HTMLElement>('[data-visual]').forEach((v) => {
       const frame = v.querySelector('.visual-frame');
@@ -199,14 +292,14 @@ export function initMotion() {
     });
   });
 
-  initHeroModel(cleanups);
+  initHeroModel(cleanups, ready);
 
   const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
   const teardown = () => {
     restores.forEach((r) => r());
     cleanups.forEach((c) => c());
     ctx.revert();
-    root.classList.remove('motion');
+    root.classList.remove('motion', 'intro');
     rm.removeEventListener('change', onRM);
     window.removeEventListener('pagehide', onHide);
   };

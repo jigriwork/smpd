@@ -1,8 +1,10 @@
 import { initHeader } from './header';
 import { initForm } from './form';
+import { initClock } from './clock';
 
 initHeader();
 initForm();
+initClock();
 
 const showStaticHero = () => {
   const img = document.querySelector<HTMLImageElement>('[data-hero-fallback]');

@@ -56,6 +56,19 @@ export const hero = {
   secondary: { label: 'Discover our story', href: '#story' },
 };
 
+/** Large scroll-lit statement directly below the hero. */
+export const intro = {
+  kicker: 'Introducing SMPD',
+  statement:
+    'SMPD is a property venture in land and homes, from a family that has served Berhampur for more than seventy years. The same values, brought to new ground.',
+};
+
+/** Words that run across the big moving band. */
+export const marquee = ['Land', 'Homes', 'Berhampur & Beyond', 'A legacy of trust', 'A new foundation'];
+
+/** Small facts along the bottom edge of the hero. */
+export const heroFacts = ['70+ years of family heritage', 'Land & Homes'];
+
 export const heritage = {
   figure: '70+',
   label: 'Years of family business heritage',

@@ -66,12 +66,21 @@ const ogImage = new URL('/og-image.jpg', site.url).href;
         d.classList.add('js');
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           d.classList.add('motion');
-          window.__motionFallback = setTimeout(function () { d.classList.remove('motion'); }, 3500);
+          // A short intro curtain, once per visit.
+          try {
+            if (!sessionStorage.getItem('smpd-intro')) { d.classList.add('intro'); sessionStorage.setItem('smpd-intro', '1'); }
+          } catch (e) {}
+          window.__motionFallback = setTimeout(function () { d.classList.remove('motion', 'intro'); }, 3500);
         }
       })();
     </script>
   </head>
   <body>
+    <div class="loader" data-loader aria-hidden="true">
+      <img class="loader-icon" src="/brand/smpd-sm-icon.svg" alt="" width="56" height="56" />
+      <p class="loader-label">SMPD · Land &amp; Homes<br /><span>Berhampur &amp; Beyond</span></p>
+      <p class="loader-count" data-loader-count>000</p>
+    </div>
     <a class="skip" href="#main">Skip to content</a>
     <slot />
   </body>
