@@ -272,8 +272,8 @@ export function createModel(opts: ModelOptions) {
   const camera = new THREE.PerspectiveCamera(26, 1, 1, 400);
   const target = new THREE.Vector3(0.5, 2.2, 0);
   const shots: Record<Shot, { pos: [number, number, number]; target: [number, number, number]; fov: number }> = {
-    hero: { pos: [68, 52, 82], target: [0.5, 1.6, 0.6], fov: 24 },
-    heroMobile: { pos: [52, 46, 66], target: [0.5, 1.6, 0.6], fov: 30 },
+    hero: { pos: [68, 52, 82], target: [0.5, 1.6, 0.6], fov: 18.5 },
+    heroMobile: { pos: [52, 46, 66], target: [0.5, 1.6, 0.6], fov: 38 },
     land: { pos: [-8, 52, 34], target: [-2, 0, 2.5], fov: 30 },
     homes: { pos: [-20, 15, 40], target: [1.2, 3.0, 0.4], fov: 21 },
     dusk: { pos: [46, 22, 54], target: [0.5, 2.6, 0.5], fov: 24 },

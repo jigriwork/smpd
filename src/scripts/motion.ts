@@ -68,7 +68,7 @@ async function initHeroModel(cleanups: (() => void)[], ready: Promise<void>) {
     const { createModel } = await import('../three/model');
     const wide = window.matchMedia('(min-width: 1021px)');
     model = createModel({ canvas, shot: wide.matches ? 'hero' : 'heroMobile' });
-    const frame = () => (wide.matches ? model.setView(0.02, -0.2) : model.setView(0, 0.02));
+    const frame = () => (wide.matches ? model.setView(0.08, -0.1) : model.setView(0, -0.04));
     frame();
     wide.addEventListener('change', frame);
     cleanups.push(() => wide.removeEventListener('change', frame));
